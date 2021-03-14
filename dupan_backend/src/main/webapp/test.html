@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<!-- import CSS -->
+<!--<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+<link rel="stylesheet" href="css/index.css">
+<body>
+
+<div id="app">
+    <el-card class="box-card">
+        <div>
+            <el-table
+                    :data="tableData"
+                    style="width: 100%"
+                    row-key="id"
+                    border
+                    @row-click="test"
+            >
+                <el-table-column
+                        type="index"
+                        label="序号"
+                        width="50px"
+                        align="center"
+                >
+                </el-table-column>
+                <el-table-column
+                        label="文件名"
+                        width="180">
+
+                    <template slot-scope="scope">
+                        <template v-if="scope.row.type == '文件夹'">
+                            <i class="el-icon-folder"></i>
+                            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                        </template>
+                        <template v-if="scope.row.type == '文件'">
+                            <i class="el-icon-document"></i>
+                            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                        </template>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        prop="type"
+                        label="文件类型"
+                        align="center">
+                </el-table-column>
+
+                <el-table-column
+                        prop="path"
+                        label="文件路径"
+                        header-align="center">
+                </el-table-column>
+            </el-table>
+        </div>
+    </el-card>
+</div>
+</body>
+<!-- import Vue before Element -->
+<!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
+<!--&lt;!&ndash; import JavaScript &ndash;&gt;-->
+<!--<script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<style>
+    .box-card {
+        width: max-content;
+        height: auto;
+    }
+
+</style>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            tableData: [{
+                id: 1,
+                name: 'APPS',
+                type: '文件夹',
+                path: '/APPS',
+                hasChildren: true
+            }, {
+                id: 2,
+                name: 'DICMS',
+                type: '文件夹',
+                path: '/DICMS',
+                hasChildren: true
+            }, {
+                id: 3,
+                name: '1.txt',
+                type: '文件',
+                path: '/1.txt',
+            }, {
+                id: 4,
+                name: '2.java',
+                type: '文件',
+                path: '/2.java',
+            }
+            ]
+        },
+        created() {
+            this.getFilesList();
+        },
+        methods: {
+            load(tree, treeNode, resolve) {
+
+                setTimeout(() => {
+                    resolve([
+                        {
+                            id: 11,
+                            name: 'haha',
+                            type: '文件夹',
+                            hasChildren: true
+                        }, {
+                            id: 21,
+                            name: '3.jpg',
+                            type: '文件'
+                        }
+                    ])
+                }, 1000)
+            },
+            getFilesList() {
+                axios.get("/user/getFiles.do").then((resp) => {
+                    this.tableData = resp.data.data;
+                });
+            },
+            test(row) {
+                alert(row.type);
+            }
+
+
+        }
+    });
+
+</script>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>百度网盘项目</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../css/index.css">
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <el-container>
+        <el-header>
+            <img v-if="imageUrl" :src="imageUrl" class="image">
+            <span>{{username}}</span>
+        </el-header>
+        <el-container>
+            <el-aside width="200px">
+                <el-menu>
+                    <template v-for="menu in menuList">
+                        <a :href="menu.url" target="right">
+                            <el-menu-item :index="menu.path" :class="menu.icon">
+                                <span slot="title">{{menu.title}}</span>
+                            </el-menu-item>
+                        </a>
+                    </template>
+                </el-menu>
+            </el-aside>
+            <el-main>
+                <iframe name="right" class="el-main" src="userInfo.html" width="100%" height="100%"
+                        frameborder="0"></iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+
+
+</div>
+</body>
+<!--引入组件-->
+<script src="../js/vue.js"></script>
+<script src="../js/index.js"></script>
+<!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
+<!--<script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+<script src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            username: null,
+            imageUrl: null,
+            loading: false,
+            menuList: [
+                {
+                    "path": "1",
+                    "icon": "el-icon-user-solid",
+                    "title": "用户信息",
+                    "url": "userInfo.html",
+                },
+                {
+                    "path": "2",
+                    "icon": "el-icon-user",
+                    "title": "好友信息",
+                    "url": "userFriends.html",
+                },
+                {
+                    "path": "3",
+                    "icon": "el-icon-folder",
+                    "title": "文件列表",
+                    "url": "userFiles.html",
+                },
+                {
+                    "path": "4",
+                    "icon": "el-icon-setting",
+                    "title": "系统设置",
+                    "url": "setting.html",
+                }
+            ]
+        },
+        created() {
+            this.getUsername();
+        },
+        methods: {
+            getUsername() {
+                this.loading = true;
+                axios.post("/user/info.do").then((resp) => {
+                    this.loading = false;
+                    if (resp.data.flag) {
+                        this.username = resp.data.data.netdisk_name;
+                        this.imageUrl = resp.data.data.avatar_url;
+                        // alert(this.imageUrl);
+                        this.$message.success(resp.data.message)
+                    } else {
+                        this.$message.error(resp.data.message)
+                    }
+                }).catch(() => {
+                    this.loading = false;
+                });
+            }
+        }
+    })
+</script>
+
+</html>

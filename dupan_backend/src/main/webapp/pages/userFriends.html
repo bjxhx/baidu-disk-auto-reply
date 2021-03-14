@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="30">
+    <title>Title</title>
+</head>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="../css/index.css">
+<!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+<link rel="stylesheet" href="../css/style.css">
+<body>
+<div id="app">
+    <el-card class="box-card" v-loading="loading">
+        <div slot="header" class="clearfix">
+            <span>好友列表</span>
+        </div>
+
+        <el-card class="user-card">
+            <template>
+                <el-table
+                        :data="friendsList"
+                        height="700px"
+                        border
+                        style="width: -moz-max-content">
+                    <el-table-column
+                            prop="uname"
+                            label="好友百度ID"
+                            width="200">
+                    </el-table-column>
+                    <el-table-column
+                            prop="nick_name"
+                            label="好友昵称"
+                            width="200">
+                    </el-table-column>
+                    <el-table-column
+                            prop="uk"
+                            label="好友UK"
+                            width="200">
+                    </el-table-column>
+                </el-table>
+            </template>
+        </el-card>
+
+    </el-card>
+</div>
+</body>
+<script src="../js/vue.js"></script>
+<script src="../js/index.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<style>
+    .user-card {
+        height: 700px;
+    }
+
+</style>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            friendsList: [],
+        },
+        created() {
+            this.findFriends();
+        },
+        methods: {
+            findFriends() {
+                this.loading = true;
+                axios.get("/user/findFriends.do").then((resp) => {
+                    this.loading = false;
+                    if (resp.data.flag) {
+                        this.$message.success(resp.data.message)
+                        this.friendsList = resp.data.data.records;
+                    } else {
+                        this.$message.error(resp.data.message)
+                    }
+
+                }).catch(() => {
+                    this.loading = false;
+                });
+            },
+        }
+    })
+</script>
+
+</html>

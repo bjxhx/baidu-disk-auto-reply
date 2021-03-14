@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--    <meta http-equiv="refresh" content="2">-->
+    <title>Title</title>
+
+</head>
+
+<!-- 引入样式 -->
+<link rel="stylesheet" href="../css/index.css">
+<link rel="stylesheet" href="../css/style.css">
+<body>
+<div id="app">
+    <el-card class="box-card" v-loading="loading">
+        <div slot="header" class="clearfix">
+            <span>用户信息</span>
+        </div>
+        <div>
+
+            <span>总空间大小：</span>
+            <span>{{storeData.total}} GB</span>
+            <hr>
+            <span>已使用空间：</span>
+            <span>{{storeData.used}} GB</span>
+            <hr>
+            <span>未使用空间：</span>
+            <span>{{storeData.free}} GB</span>
+        </div>
+
+    </el-card>
+
+</div>
+
+
+</body>
+<!--引入组件-->
+<script src="../js/vue.js"></script>
+<script src="../js/index.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+
+<style>
+
+</style>
+
+<script>
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            loading: false,
+            storeData: [],
+        },
+
+
+        created() {
+            this.findPage();
+        },
+        methods: {
+
+            findPage() {
+                this.loading = true;
+                // 获取存储数据
+                axios.get("/user/storeData.do").then((resp) => {
+                    this.loading = false;
+                    this.storeData.total = parseInt(resp.data.data.total / 1024 / 1024 / 1024);
+                    this.storeData.used = parseInt(resp.data.data.used / 1024 / 1024 / 1024);
+                    this.storeData.free = this.storeData.total - this.storeData.used;
+                }).catch(() => {
+                    this.loading = false;
+                });
+            },
+            sendMsg() {
+                this.loading = true;
+                axios.get("/user/sendMsg.do").then((resp) => {
+                    this.loading = false;
+                    if (resp.data.flag) {
+                        this.$message.success(resp.data.message)
+                    } else {
+                        this.$message.error(resp.data.message)
+                    }
+
+                }).catch(() => {
+                    this.loading = false;
+                });
+            },
+
+
+        }
+
+    })
+</script>
+</html>

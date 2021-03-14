@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.xhx.dao.DuyunDao">
+
+    <select id="getUserInfo" parameterType="string" resultType="map">
+        select * from t_user where baidu_uk = #{baidu_uk}
+    </select>
+
+    <insert id="saveUser" parameterType="map">
+        insert into t_user values(null,#{baidu_name},#{netdisk_name},#{baidu_uk})
+    </insert>
+
+    <select id="findAllAutoKey" resultType="xyz.xhx.entity.AutoKeyCommons">
+        select * from t_autokey
+    </select>
+
+    <delete id="deleteAutoKeyById" parameterType="int">
+        DELETE FROM t_autokey WHERE id = #{id}
+    </delete>
+
+    <insert id="addAutoKey" parameterType="xyz.xhx.entity.AutoKeyCommons">
+        insert into t_autokey(code,count,fsId)
+        values
+        (#{code},#{count},#{fsId})
+    </insert>
+
+    <update id="editAutoKey" parameterType="xyz.xhx.entity.AutoKeyCommons">
+        update t_autokey
+        <set>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="count != null">
+                count = #{count},
+            </if>
+            <if test="fsId != null">
+                fsId = #{fsId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

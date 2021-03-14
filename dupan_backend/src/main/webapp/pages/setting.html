@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>系统设置</title>
+</head>
+<link rel="stylesheet" href="../css/index.css">
+<link rel="stylesheet" href="../css/style.css">
+<body>
+<div id="app">
+    <el-card class="box-card" v-loading="loading">
+        <div slot="header" class="clearfix">
+            <span>任务管理</span>
+        </div>
+        <el-button type="success" @click="jobSetting(start)">开始任务</el-button>
+        <el-button type="danger" @click="jobSetting(end)">结束任务</el-button>
+        <hr>
+        <el-button type="info" @click="handleCreate">新建配置</el-button>
+        <el-button type="info" @click="getAutoKey">获取所有任务配置</el-button>
+<!--        <el-button type="info" @click="autoRefresh">开启自动刷新任务配置</el-button>-->
+        <el-table
+                :data="tableData"
+                style="width: 100%"
+                border>
+            <el-table-column
+                    type="index"
+                    label="序号"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="code"
+                    label="验证码"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="count"
+                    width="100"
+                    label="剩余次数">
+            </el-table-column>
+            <el-table-column
+                    prop="fsId"
+                    label="文件FS_ID">
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
+
+    <!-- 新增标签弹层 -->
+    <div class="add-form">
+        <el-dialog title="新增自动配置" :visible.sync="dialogFormVisible4Create">
+            <el-form ref="dataAddForm" :model="formData" label-position="right" label-width="100px">
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="匹配验证码" prop="code">
+                            <el-input v-model="formData.code"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="可使用次数" prop="fsId">
+                            <el-input v-model="formData.count"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="文件FS_ID" prop="fsId">
+                            <el-input v-model="formData.fsId"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible4Create = false">取消</el-button>
+                <el-button type="primary" @click="handleAdd()">确定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+
+    <!-- 编辑标签弹层 -->
+    <div class="add-form">
+        <el-dialog title="编辑自动配置" :visible.sync="dialogFormVisible4Edit">
+            <el-form ref="dataAddForm" :model="formData" label-position="right" label-width="100px">
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="匹配验证码" prop="code">
+                            <el-input v-model="formData.code"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="可使用次数" prop="fsId">
+                            <el-input v-model="formData.count"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="文件FS_ID" prop="fsId">
+                            <el-input v-model="formData.fsId"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible4Edit = false">取消</el-button>
+                <el-button type="primary" @click="handleEdit()">确定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+
+</div>
+</body>
+<!--引入组件-->
+<script src="../js/vue.js"></script>
+<script src="../js/index.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script>
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            formData: {},
+            loading: false,
+            start: "start",
+            end: "stop",
+            tableData: [],
+            dialogFormVisible4Create: false,
+            dialogFormVisible4Edit: false,
+        },
+        created() {
+
+            this.getAutoKey();
+
+        },
+        methods: {
+            jobSetting(value) {
+                axios.get("/user/jobSetting.do?method=" + value).then((resp) => {
+                    if (resp.data.flag) {
+                        this.$message.success(resp.data.message);
+                    } else {
+                        this.$message.error(resp.data.message);
+                    }
+                });
+            },
+            getAutoKey() {
+
+                this.loading = true;
+
+                axios.get("/user/getAutoKey.do").then((resp) => {
+                    this.loading = false;
+                    this.tableData = resp.data.data;
+                }).catch(() => {
+                    this.loading = false;
+                });
+            },
+
+            // 弹出新建页面
+            handleCreate() {
+                this.formData = {};
+                this.dialogFormVisible4Create = true;
+
+            },
+            // 弹出编辑页面
+            handleUpdate(row) {
+                this.formData = {...row};
+                this.dialogFormVisible4Edit = true;
+            },
+            handleAdd() {
+
+                axios.post("/user/addAutoKey.do", this.formData).then((resp) => {
+                    this.isFlag(resp);
+                }).finally(() => {
+                    // 无论添加成功与否，都重新分页查询
+                    this.getAutoKey();
+                    // 隐藏编辑窗口
+                    this.dialogFormVisible4Create = false;
+
+                });
+
+
+            },
+            handleEdit() {
+                axios.post("/user/editAutoKey.do", this.formData).then((resp) => {
+                    this.isFlag(resp);
+                }).finally(() => {
+                    // 无论添加成功与否，都重新分页查询
+                    this.getAutoKey();
+                    // 隐藏编辑窗口
+                    this.dialogFormVisible4Edit = false;
+
+                });
+
+            },
+            handleDelete(row) {
+                this.$confirm("你确定要删除当前数据吗？", "提示", {//确认框
+                    type: 'warning'
+                }).then(() => {
+                    //用户点击确定按钮，发送ajax请求，将检查项ID提交到Controller进行处理
+                    axios.get("/user/deleteAutoKeyById.do?idStr=" + row.id).then((res) => {
+                        if (res.data.flag) {
+                            //执行成功
+                            //弹出成功提示信息
+                            this.$message({
+                                type: 'success',
+                                message: res.data.message
+                            });
+                            //重新进行查询
+                            this.getAutoKey();
+                        } else {
+                            //执行失败
+                            this.$message.error(res.data.message);
+                        }
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '操作已取消'
+                    });
+                });
+            },
+            // 操作判断方法
+            isFlag(resp) {
+                if (resp.data.flag) {
+                    // 成功
+                    this.$message({
+                        message: resp.data.message,
+                        type: 'success'
+                    });
+                } else {
+                    // 失败
+                    this.$message.error(resp.data.message);
+                }
+            },
+            autoRefresh() {
+                setInterval(()=>{
+                    this.getAutoKey();
+                }, 5000)
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>files</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="app">
+
+    <el-card class="box-card" v-loading="loading">
+        <div slot="header" class="clearfix">
+            <span>文件列表</span>
+            <el-button style="float: right; padding: 3px 0" type="primary" @click="getFilesList()">获取文件列表</el-button>
+        </div>
+        <div>
+            <el-link type="primary" @click="getFilesList()">/</el-link>
+        </div>
+        <hr>
+            <el-table
+                    :data="tableData"
+                    style="width: 100%"
+                    row-key="id"
+                    border
+                    @row-dblclick="openFolder"
+                    row-click="getFiles">
+                <el-table-column
+                        type="index"
+                        label="序号"
+                        width="50px"
+                        align="center"
+                >
+                </el-table-column>
+                <el-table-column
+                        label="文件名"
+                        width="250">
+
+                    <template slot-scope="scope">
+                        <template v-if="scope.row.type == '文件夹'">
+                            <i class="el-icon-folder"></i>
+                            <span style="margin-left: 10px">{{ scope.row.server_filename }}</span>
+                        </template>
+                        <template v-if="scope.row.type == '文件'">
+                            <i class="el-icon-document"></i>
+                            <span style="margin-left: 10px">{{ scope.row.server_filename }}</span>
+                        </template>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        prop="type"
+                        label="文件类型"
+                        align="center"
+                        width="100">
+                </el-table-column>
+
+                <el-table-column
+                        prop="path"
+                        label="文件路径"
+                        header-align="center"
+                        width="200">
+                </el-table-column>
+                <el-table-column
+                        prop="fs_id"
+                        label="文件FS_ID"
+                        header-align="center"
+                        width="200">
+                </el-table-column>
+            </el-table>
+    </el-card>
+
+</div>
+
+
+</body>
+
+<style>
+    .el-table {
+        border: lightgreen 2px solid;
+    }
+
+    .el-table el-table-column {
+        border: lightgreen 2px solid;
+    }
+</style>
+<script src="../js/vue.js"></script>
+<script src="../js/index.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            loading: false,
+            tableData: [{
+                id: 1,
+                name: 'APPS',
+                type: '文件夹',
+                path: '/APPS',
+                hasChildren: true
+            }, {
+                id: 2,
+                name: 'DICMS',
+                type: '文件夹',
+                path: '/DICMS',
+                hasChildren: true
+            }, {
+                id: 3,
+                name: '1.txt',
+                type: '文件',
+                path: '/1.txt',
+            }, {
+                id: 4,
+                name: '2.java',
+                type: '文件',
+                path: '/2.java',
+            }
+            ]
+        },
+        created() {
+            this.getFilesList();
+        },
+        methods: {
+            getFilesList(path) {
+
+                this.loading = true;
+                axios.post("/user/getFiles.do",{path:path}).then((resp) => {
+                    this.loading = false;
+                    if (resp.data.flag){
+                        this.tableData = resp.data.data;
+                    }else {
+                        this.tableData = [];
+                    }
+
+                }).catch(()=>{
+                    this.loading = false;
+                });
+
+            },
+            openFolder(row) {
+                if (row.type == "文件夹") {
+                    this.getFilesList(row.path);
+                } else {
+                    this.$message.error("文件请下载后再打开！！！")
+                }
+
+            }
+        },
+
+    });
+</script>
+</html>

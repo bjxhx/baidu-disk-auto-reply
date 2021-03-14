@@ -1,0 +1,91 @@
+
+.el-container {
+    margin-top: 0;
+}
+
+.el-header {
+    background-color: #B3C0D1;
+    color: #333;
+    text-align: left;
+    width: auto;
+    line-height: 60px;
+    font-size: 20px
+}
+
+.el-header img {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    vertical-align: middle
+}
+
+
+.el-aside {
+    border: #B3C0D1 2px solid;
+    color: #333;
+    background-color: #d9ecff;
+}
+
+
+.main aside .el-menu{
+    width: 100%;
+    border-right:0;
+}
+.el-menu-item{
+    width: 100%;
+}
+.el-menu-item a span {
+    width: 100%;
+}
+.el-menu-item a{
+    color: #303133;
+    text-decoration:none;
+}
+.el-menu-item:hover,.el-menu-item.is-active {
+    color: #fff;
+    background: #d9d9d9;
+}
+.el-menu-item:hover a,.el-menu-item.is-active a{
+    color: #fff;
+}
+.el-submenu__title:hover{background: none;}
+
+.el-submenu .el-menu-item a{
+    display: block;
+    height: 50px;
+}
+.el-menu{border: 0 none;}
+
+.el-main{
+    height: 100vh;
+    min-width: 800px;
+    min-height: 600px;
+    overflow: hidden;
+}
+.el-menu iframe{
+
+    border-right: #B3C0D1 2px solid;
+}
+
+.box-card {
+    width: 100%;
+    height: auto;
+}
+
+.user-card {
+    width: -moz-max-content;
+    height: 100%;
+}
+
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: "";
+}
+
+.clearfix:after {
+    clear: both
+}
+
+
+
